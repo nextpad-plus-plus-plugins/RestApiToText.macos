@@ -663,45 +663,7 @@ static void MakeRestCall() {
     [self.window orderOut:nil];
 }
 
-// Build the About window (mirrors IDD_RESTAPITOTEXT).
-+ (RA2TDialogController *)about {
-    RA2TDialogController *c = [[RA2TDialogController alloc] init];
-    const CGFloat W = 540, H = 220;
-    c.window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, W, H)
-                                           styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable)
-                                             backing:NSBackingStoreBuffered
-                                               defer:NO];
-    c.window.title = @"REST API To Text";
-    c.window.delegate = c;
-    c.window.releasedWhenClosed = NO;
-    NSView *root = c.window.contentView;
-
-    CGFloat y = H - 44;
-    const CGFloat labelX = 20, valueX = 110, rowH = 22;
-
-    [c label:@"Author:"  frame:NSMakeRect(labelX, y, 80, 18) to:root];
-    [c label:@"Jeffrey Smith <jeffdsmith3@gmail.com>" frame:NSMakeRect(valueX, y, W - valueX - 20, 18) to:root];
-    y -= rowH;
-    [c label:@"License:" frame:NSMakeRect(labelX, y, 80, 18) to:root];
-    [c label:@"GNU GPL v3" frame:NSMakeRect(valueX, y, W - valueX - 20, 18) to:root];
-    y -= rowH;
-    [c label:@"Version:" frame:NSMakeRect(labelX, y, 80, 18) to:root];
-    [c label:@"1.4.0.1 (macOS port)" frame:NSMakeRect(valueX, y, W - valueX - 20, 18) to:root];
-    y -= rowH;
-    [c label:@"Project:" frame:NSMakeRect(labelX, y, 80, 18) to:root];
-    [c link:@"https://github.com/eljefe7000/RestApiToText"
-          at:NSMakeRect(valueX - 2, y, W - valueX - 20, 18) to:root];
-    y -= rowH;
-    [c label:@"Plugin News:" frame:NSMakeRect(labelX, y, 90, 18) to:root];
-    [c link:@"https://community.notepad-plus-plus.org/category/5/plugin-development"
-          at:NSMakeRect(valueX - 2, y, W - valueX - 20, 18) to:root];
-
-    NSButton *ok = [NSButton buttonWithTitle:@"OK" target:c action:@selector(ok:)];
-    ok.frame = NSMakeRect(W - 98, 16, 80, 30);
-    ok.keyEquivalent = @"\r";
-    [root addSubview:ok];
-    return c;
-}
+// (The About box is a native NSAlert now — see AboutDialog() below.)
 
 // Build the Help window (mirrors IDD_HELP).
 + (RA2TDialogController *)help {
@@ -766,7 +728,26 @@ static void MakeRestCall() {
 @end
 
 static void AboutDialog() {
-    @autoreleasepool { [[RA2TDialogController about] runModal]; }
+    @autoreleasepool {
+        NSAlert *a = [[NSAlert alloc] init];
+        a.alertStyle = NSAlertStyleInformational;
+        a.messageText = @"REST API To Text";
+        a.informativeText =
+            @"REST API To Text for Notepad++ (macOS port)\n"
+            @"Version 1.0.0\n\n"
+            @"Sends an HTTP/REST request described in the current document and writes the "
+            @"response into a new tab.\n\n"
+            @"Features:\n"
+            @"- Reads the verb, URL, headers, body and options from the buffer\n"
+            @"- HTTPS and all methods; $(env:VAR) expansion; JSON pretty-print\n"
+            @"- The response opens in a new tab\n"
+            @"- \"Help\" command shows the full request syntax\n\n"
+            @"Original Windows plugin by Jeffrey Smith (GPL v3)\n"
+            @"macOS port by Andrey Letov\n"
+            @"Project home: https://github.com/nextpad-plus-plus-plugins/RestApiToText.macos";
+        [a addButtonWithTitle:@"OK"];
+        [a runModal];
+    }
 }
 
 static void HelpDialog() {
